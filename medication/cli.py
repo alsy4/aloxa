@@ -81,6 +81,48 @@ def update_medication(manager: MedicationManager):
     print(f"  Updated '{name}' — {', '.join(times)}")
 
 
+def respond_to_reminders(manager: MedicationManager):
+    pending = manager.get_pending_reminders()
+    if not pending:
+        print("  No pending reminders.")
+        return
+
+    for r in pending:
+        print(f"\n  [{r['id']}] {r['name']} {r['dosage']} — scheduled {r['scheduled_time']} (since {r['reminded_at']})")
+        choice = input("  Mark as (t)aken, (m)issed, or (s)kip? ").strip().lower()
+        if choice == "t":
+            manager.mark_taken(r["id"])
+            print(f"  Marked as taken.")
+        elif choice == "m":
+            manager.mark_missed(r["id"])
+            print(f"  Marked as missed.")
+        else:
+            print(f"  Skipped.")
+
+
+def view_intake_history(manager: MedicationManager):
+    print_medications(manager)
+    raw = input("  Enter medication ID (or Enter for all): ").strip()
+
+    if raw and not raw.isdigit():
+        print("  Invalid ID.")
+        return
+
+    if raw:
+        history = manager.get_intake_history(int(raw))
+    else:
+        history = manager.get_all_intake_history()
+
+    if not history:
+        print("  No intake history.")
+        return
+
+    for entry in history:
+        status = entry["status"].upper()
+        responded = entry["responded_at"] or "—"
+        print(f"  {entry['reminded_at']} | {entry['scheduled_time']} | {status} | responded: {responded}")
+
+
 def delete_medication(manager: MedicationManager):
     print_medications(manager)
     raw = input("  Enter medication ID to delete: ").strip()

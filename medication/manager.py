@@ -162,6 +162,29 @@ class MedicationManager:
         conn.close()
         return [dict(r) for r in rows]
 
+    def has_reminder_today(self, medication_id: int, scheduled_time: str) -> bool:
+        """Check if a reminder was already logged today for this medication+time."""
+        today = datetime.now().strftime("%Y-%m-%d")
+        conn = get_connection()
+        row = conn.execute(
+            "SELECT id FROM intake_log "
+            "WHERE medication_id = ? AND scheduled_time = ? AND DATE(reminded_at) = ?",
+            (medication_id, scheduled_time, today),
+        ).fetchone()
+        conn.close()
+        return row is not None
+
+    def get_all_intake_history(self) -> list[dict]:
+        """Return all intake log entries across all medications."""
+        conn = get_connection()
+        rows = conn.execute(
+            "SELECT il.*, m.name, m.dosage FROM intake_log il "
+            "JOIN medications m ON il.medication_id = m.id "
+            "ORDER BY il.reminded_at DESC",
+        ).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
     def get_pending_reminders(self) -> list[dict]:
         """Return all currently pending intake log entries."""
         conn = get_connection()
