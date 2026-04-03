@@ -1,6 +1,7 @@
 # Claude files
 CLAUDE.md
 FR-implementation.md
+settings.local.json
 
 #Python files
 __pycache__
