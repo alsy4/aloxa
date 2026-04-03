@@ -4,6 +4,7 @@ from medication.cli import (
     add_medication,
     delete_medication,
     print_medications,
+    reset_all_data,
     respond_to_reminders,
     update_medication,
     view_intake_history,
@@ -26,7 +27,8 @@ def main():
         print("  4. Delete medication")
         print("  5. Respond to reminders")
         print("  6. Intake history")
-        print("  7. Exit")
+        print("  7. Reset all data")
+        print("  8. Exit")
 
         choice = input("Select: ").strip()
 
@@ -43,6 +45,8 @@ def main():
         elif choice == "6":
             view_intake_history(manager)
         elif choice == "7":
+            reset_all_data(manager)
+        elif choice == "8":
             scheduler.stop()
             print("Bye.")
             break

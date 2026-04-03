@@ -135,3 +135,12 @@ def delete_medication(manager: MedicationManager):
         print(f"  Deleted medication {med_id}.")
     else:
         print(f"  Medication {med_id} not found.")
+
+
+def reset_all_data(manager: MedicationManager):
+    confirm = input("  This will delete ALL medications and intake history. Type 'yes' to confirm: ").strip()
+    if confirm == "yes":
+        manager.reset_all()
+        print("  All data has been reset.")
+    else:
+        print("  Cancelled.")

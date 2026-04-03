@@ -25,6 +25,7 @@ class MedicationManager:
             )
         conn.commit()
         conn.close()
+        self.populate_daily_reminders(med_id)
         return med_id
 
     def get_all_medications(self) -> list[Medication]:
@@ -91,7 +92,18 @@ class MedicationManager:
                 )
         conn.commit()
         conn.close()
+        if "times" in fields:
+            self.populate_daily_reminders(med_id)
         return True
+
+    def reset_all(self):
+        """Delete all medications, times, and intake logs."""
+        conn = get_connection()
+        conn.execute("DELETE FROM intake_log")
+        conn.execute("DELETE FROM medication_times")
+        conn.execute("DELETE FROM medications")
+        conn.commit()
+        conn.close()
 
     def delete_medication(self, med_id: int) -> bool:
         conn = get_connection()
@@ -101,6 +113,20 @@ class MedicationManager:
         return cursor.rowcount > 0
 
     # ── Intake logging ──────────────────────────────────────
+
+    def populate_daily_reminders(self, medication_id: int | None = None):
+        """Create pending intake_log entries for today. Skips times that already have an entry.
+        If medication_id is given, only populate for that medication; otherwise for all."""
+        if medication_id:
+            meds = [self.get_medication(medication_id)]
+            meds = [m for m in meds if m is not None]
+        else:
+            meds = self.get_all_medications()
+
+        for med in meds:
+            for t in med.scheduled_times:
+                if not self.has_reminder_today(med.id, t):
+                    self.log_reminder(med.id, t)
 
     def log_reminder(self, medication_id: int, scheduled_time: str) -> int:
         """Create a pending intake log entry when a reminder fires."""

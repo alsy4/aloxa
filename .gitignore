@@ -2,6 +2,7 @@
 CLAUDE.md
 FR-implementation.md
 settings.local.json
+.claude
 
 #Python files
 __pycache__
