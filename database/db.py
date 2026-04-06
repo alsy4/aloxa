@@ -21,4 +21,15 @@ def init_db():
 
     conn = get_connection()
     conn.executescript(schema)
+    _migrate(conn)
     conn.close()
+
+
+def _migrate(conn: sqlite3.Connection):
+    """Add columns that may be missing from older databases."""
+    columns = {r[1] for r in conn.execute("PRAGMA table_info(intake_log)").fetchall()}
+    if "alert_count" not in columns:
+        conn.execute("ALTER TABLE intake_log ADD COLUMN alert_count INTEGER NOT NULL DEFAULT 0")
+    if "last_alerted_at" not in columns:
+        conn.execute("ALTER TABLE intake_log ADD COLUMN last_alerted_at TIMESTAMP")
+    conn.commit()

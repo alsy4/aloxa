@@ -23,5 +23,7 @@ CREATE TABLE IF NOT EXISTS intake_log (
     status TEXT NOT NULL DEFAULT 'pending',  -- 'pending', 'taken', 'missed'
     reminded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP,  -- set when status changes to taken/missed
+    alert_count INTEGER NOT NULL DEFAULT 0,  -- how many times alert has fired
+    last_alerted_at TIMESTAMP,  -- when the last alert was triggered
     FOREIGN KEY (medication_id) REFERENCES medications(id) ON DELETE CASCADE
 );

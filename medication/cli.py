@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 
 from medication.manager import MedicationManager
 
@@ -135,6 +136,26 @@ def delete_medication(manager: MedicationManager):
         print(f"  Deleted medication {med_id}.")
     else:
         print(f"  Medication {med_id} not found.")
+
+
+def load_mock_data(manager: MedicationManager):
+    """Insert test medications with a reminder due right now to exercise repeat alerts."""
+    manager.reset_all()
+
+    now = datetime.now()
+    # A time 2 minutes ago — triggers immediately and repeats every 5 min
+    past_time = (now - timedelta(minutes=2)).strftime("%H:%M")
+    # A time 30 minutes from now — won't fire yet
+    future_time = (now + timedelta(minutes=30)).strftime("%H:%M")
+
+    manager.add_medication("Paracetamol", "500mg", "Take with water", [past_time])
+    manager.add_medication("Vitamin D", "1000 IU", "Take with food", [past_time, future_time])
+    manager.add_medication("Ibuprofen", "200mg", "Take after meal", [future_time])
+
+    print(f"  Mock data loaded.")
+    print(f"  Paracetamol  — due at {past_time} (should alert NOW and repeat every 5 min)")
+    print(f"  Vitamin D    — due at {past_time} (should alert NOW) + {future_time} (later)")
+    print(f"  Ibuprofen    — due at {future_time} (not yet)")
 
 
 def reset_all_data(manager: MedicationManager):

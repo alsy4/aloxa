@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from config import MISSED_TIMEOUT_SECONDS
+from config import MISSED_TIMEOUT_SECONDS, REMINDER_REPEAT_DELAY_SECONDS
 from database import get_connection
 from medication.models import Medication
 
@@ -221,3 +221,39 @@ class MedicationManager:
         ).fetchall()
         conn.close()
         return [dict(r) for r in rows]
+
+    def get_due_alerts(self) -> list[dict]:
+        """Return pending reminders whose scheduled time has passed and are due for
+        an alert — either never alerted or last alerted >= REMINDER_REPEAT_DELAY_SECONDS ago."""
+        now = datetime.now()
+        today = now.strftime("%Y-%m-%d")
+        current_time = now.strftime("%H:%M")
+        cutoff = (now - timedelta(seconds=REMINDER_REPEAT_DELAY_SECONDS)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        conn = get_connection()
+        rows = conn.execute(
+            "SELECT il.*, m.name, m.dosage FROM intake_log il "
+            "JOIN medications m ON il.medication_id = m.id "
+            "WHERE il.status = 'pending' "
+            "  AND DATE(il.reminded_at) = ? "
+            "  AND il.scheduled_time <= ? "
+            "  AND (il.last_alerted_at IS NULL OR il.last_alerted_at <= ?) "
+            "ORDER BY il.scheduled_time",
+            (today, current_time, cutoff),
+        ).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    def record_alert(self, log_id: int):
+        """Bump the alert_count and set last_alerted_at for a pending reminder."""
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = get_connection()
+        conn.execute(
+            "UPDATE intake_log SET alert_count = alert_count + 1, "
+            "last_alerted_at = ? WHERE id = ?",
+            (now, log_id),
+        )
+        conn.commit()
+        conn.close()
