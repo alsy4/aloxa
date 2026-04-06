@@ -16,3 +16,13 @@ REMINDER_REPEAT_DELAY_SECONDS = 30  # 5 minutes
 VOSK_MODEL_PATH = os.path.join(BASE_DIR, "models", "vosk-model-small-en-us-0.15")
 AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
+
+# Ollama LLM
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_MODEL = "qwen2.5:0.5b"
+OLLAMA_SYSTEM_PROMPT = (
+    "You are Aloxa, a friendly medication reminder assistant. "
+    "Keep responses concise and helpful. "
+    "If asked about health topics, always end with: "
+    "'Note: This is not medical advice.'"
+)

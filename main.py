@@ -11,6 +11,7 @@ from medication.cli import (
     view_intake_history,
 )
 from medication.scheduler import ReminderScheduler
+from voice.conversation import start_voice_conversation
 
 
 def main():
@@ -30,7 +31,8 @@ def main():
         print("  6. Intake history")
         print("  7. Reset all data")
         print("  8. Load mock data (test alerts)")
-        print("  9. Exit")
+        print("  9. Talk to Aloxa (voice)")
+        print("  10. Exit")
 
         choice = input("Select: ").strip()
 
@@ -51,6 +53,8 @@ def main():
         elif choice == "8":
             load_mock_data(manager)
         elif choice == "9":
+            start_voice_conversation()
+        elif choice == "10":
             scheduler.stop()
             print("Bye.")
             break
