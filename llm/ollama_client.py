@@ -11,11 +11,18 @@ class OllamaClient:
         self.system_prompt = system_prompt
         self.history: list[dict] = []
 
-    def chat(self, user_message: str) -> str:
-        """Send a message and return the assistant's reply. Maintains conversation history."""
+    def chat(self, user_message: str, extra_context: str = "") -> str:
+        """Send a message and return the assistant's reply. Maintains conversation history.
+
+        extra_context is appended to the system prompt for this turn only (e.g. pending reminders).
+        """
         self.history.append({"role": "user", "content": user_message})
 
-        messages = [{"role": "system", "content": self.system_prompt}] + self.history
+        system = self.system_prompt
+        if extra_context:
+            system = f"{system}\n\n{extra_context}"
+
+        messages = [{"role": "system", "content": system}] + self.history
 
         try:
             resp = requests.post(

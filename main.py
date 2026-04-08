@@ -53,7 +53,7 @@ def main():
         elif choice == "8":
             load_mock_data(manager)
         elif choice == "9":
-            start_voice_conversation()
+            start_voice_conversation(manager)
         elif choice == "10":
             scheduler.stop()
             print("Bye.")

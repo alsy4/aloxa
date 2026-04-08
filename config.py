@@ -10,10 +10,10 @@ MISSED_TIMEOUT_SECONDS = 3 * 60 * 60  # 3 hours
 SCHEDULER_POLL_INTERVAL = 30
 
 # How long (seconds) between repeat alerts for unanswered reminders
-REMINDER_REPEAT_DELAY_SECONDS = 30  # 5 minutes
+REMINDER_REPEAT_DELAY_SECONDS = 5 * 60  # 5 minutes
 
-# Speech recognition (Vosk)
-VOSK_MODEL_PATH = os.path.join(BASE_DIR, "models", "vosk-model-small-en-us-0.15")
+# Speech recognition (Whisper)
+WHISPER_MODEL = "base"
 AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
 
