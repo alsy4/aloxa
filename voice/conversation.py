@@ -109,7 +109,8 @@ def start_voice_conversation(manager: MedicationManager):
     print("\n  Starting voice conversation with Aloxa...")
     print("  Say 'stop', 'exit', or 'quit' to end.\n")
 
-    listener = SpeechListener()
+    med_names = [m.name for m in manager.get_all_medications()]
+    listener = SpeechListener(medication_names=med_names)
     client = OllamaClient()
 
     exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
