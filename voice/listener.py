@@ -1,3 +1,4 @@
+import difflib
 import tempfile
 import wave
 
@@ -13,14 +14,23 @@ SILENCE_THRESHOLD = 500
 SILENCE_CHUNKS = 30
 CHUNK_SIZE = 1024
 
+# Fuzzy matching threshold (0.0–1.0); higher = stricter
+_FUZZY_CUTOFF = 0.6
+
 
 class SpeechListener:
     """Captures audio from USB microphone and converts speech to text using Whisper."""
 
-    def __init__(self):
+    def __init__(self, medication_names: list[str] | None = None):
         print("  Loading Whisper model...")
         self.model = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
         self.audio = pyaudio.PyAudio()
+        self.set_medication_names(medication_names or [])
+
+    def set_medication_names(self, names: list[str]):
+        """Update the list of known medication names used for prompting and fuzzy matching."""
+        self._med_names = names
+        self._initial_prompt = ", ".join(names) if names else None
 
     def listen(self) -> str:
         """Listen for speech and return the transcribed text.
@@ -74,8 +84,38 @@ class SpeechListener:
                 wf.setframerate(AUDIO_RATE)
                 wf.writeframes(b"".join(frames))
 
-            segments, _ = self.model.transcribe(tmp.name, language="en")
-            return " ".join(seg.text.strip() for seg in segments).strip()
+            segments, _ = self.model.transcribe(
+                tmp.name, language="en", initial_prompt=self._initial_prompt,
+            )
+            text = " ".join(seg.text.strip() for seg in segments).strip()
+            return self._fix_medication_names(text)
+
+    def _fix_medication_names(self, text: str) -> str:
+        """Replace words in text that fuzzy-match a known medication name."""
+        if not self._med_names:
+            return text
+
+        words = text.split()
+        fixed: list[str] = []
+        i = 0
+        while i < len(words):
+            matched = False
+            # Try matching multi-word medication names (longest first)
+            for name in sorted(self._med_names, key=lambda n: -len(n.split())):
+                n_words = len(name.split())
+                candidate = " ".join(words[i:i + n_words])
+                matches = difflib.get_close_matches(
+                    candidate.lower(), [name.lower()], n=1, cutoff=_FUZZY_CUTOFF,
+                )
+                if matches:
+                    fixed.append(name)
+                    i += n_words
+                    matched = True
+                    break
+            if not matched:
+                fixed.append(words[i])
+                i += 1
+        return " ".join(fixed)
 
     def close(self):
         self.audio.terminate()
