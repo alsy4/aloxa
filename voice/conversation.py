@@ -1,4 +1,5 @@
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from llm.intent_classifier import classify_intent
@@ -26,7 +27,9 @@ INSTRUCTIONS:
 it matches and include EXACTLY this tag in your response: [TAKEN: medication_name]
 - The medication_name must match one of the registered medication names above exactly.
 - If no pending reminders match, do NOT include the tag.
-- Always respond naturally in addition to any tag."""
+- Always respond naturally in addition to any tag.
+
+"""
 
 
 def _build_medication_context(manager: MedicationManager) -> str:
@@ -126,28 +129,35 @@ def start_voice_conversation(manager: MedicationManager):
 
             print(f"  You: {text}")
 
-            if text.strip().lower() in exit_words:
+            # Strip punctuation and check if any word is an exit word
+            words = re.sub(r"[^\w\s]", "", text.lower()).split()
+            if words and set(words) & exit_words:
                 print("  Aloxa: Goodbye!")
                 tts.speak("Goodbye!")
                 break
 
-            intent = classify_intent(text)
-            print(f"  [Intent: {intent}]")
+            # Run intent classification and medication context building in parallel
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                intent_future = pool.submit(classify_intent, text, med_names)
+                context_future = pool.submit(_build_medication_context, manager)
 
-            if intent == "HEALTH":
-                print("  [Routing to Watson API]")
-                reply = "This is a health-related query. Routing to Watson API..."
-            elif intent == "WEATHER":
-                print("  [Routing to Weather API]")
-                reply = "This is a weather-related query. Routing to Weather API..."
-            elif intent == "MEDICATION":
-                print("  Aloxa is thinking...")
-                context = _build_medication_context(manager)
-                reply = client.chat(text, extra_context=context)
-                reply = _process_taken_tags(reply, manager)
-            else:
-                print("  Aloxa is thinking...")
-                reply = client.chat(text)
+                intent = intent_future.result()
+                print(f"  [Intent: {intent}]")
+
+                if intent == "HEALTH":
+                    print("  [Routing to Watson API]")
+                    reply = "This is a health-related query. Routing to Watson API..."
+                elif intent == "WEATHER":
+                    print("  [Routing to Weather API]")
+                    reply = "This is a weather-related query. Routing to Weather API..."
+                elif intent == "MEDICATION":
+                    print("  Aloxa is thinking...")
+                    context = context_future.result()
+                    reply = client.chat(text, extra_context=context)
+                    reply = _process_taken_tags(reply, manager)
+                else:
+                    print("  Aloxa is thinking...")
+                    reply = client.chat(text)
 
             print(f"  Aloxa: {reply}\n")
             tts.speak(reply)

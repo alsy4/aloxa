@@ -45,7 +45,7 @@ INTENT_SYSTEM_PROMPT = (
 )
 
 # models = ["qwen2.5:7b", "deepseek-r1:8b", "gemma2:2b", "granite3.1-dense:8b"]
-models = ["qwen2.5:0.5b"]
+models = ["gemma3:1b"]
 
 
 def run_generation_test(model_name, prompt):
