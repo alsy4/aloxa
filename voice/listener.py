@@ -1,6 +1,4 @@
 import difflib
-import tempfile
-import wave
 
 import numpy as np
 import pyaudio
@@ -11,8 +9,8 @@ from config import WHISPER_MODEL, AUDIO_RATE, AUDIO_CHANNELS
 # Silence threshold — frames below this RMS are considered silence
 SILENCE_THRESHOLD = 500
 # How many consecutive silent chunks before we stop recording
-SILENCE_CHUNKS = 30
-CHUNK_SIZE = 1024
+SILENCE_CHUNKS = 10
+CHUNK_SIZE = 2048
 
 # Fuzzy matching threshold (0.0–1.0); higher = stricter
 _FUZZY_CUTOFF = 0.6
@@ -26,6 +24,14 @@ class SpeechListener:
         self.model = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
         self.audio = pyaudio.PyAudio()
         self.set_medication_names(medication_names or [])
+        self._warm_up()
+
+    def _warm_up(self):
+        """Run a dummy transcription to warm up the model pipeline."""
+        dummy = np.zeros(AUDIO_RATE, dtype=np.float32)
+        segments, _ = self.model.transcribe(dummy, beam_size=1)
+        for _ in segments:
+            pass
 
     def set_medication_names(self, names: list[str]):
         """Update the list of known medication names used for prompting and fuzzy matching."""
@@ -76,19 +82,18 @@ class SpeechListener:
         if not frames:
             return ""
 
-        # Write to a temp WAV file for Whisper
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
-            with wave.open(tmp.name, "wb") as wf:
-                wf.setnchannels(AUDIO_CHANNELS)
-                wf.setsampwidth(self.audio.get_sample_size(pyaudio.paInt16))
-                wf.setframerate(AUDIO_RATE)
-                wf.writeframes(b"".join(frames))
+        # Convert raw audio bytes to float32 numpy array for direct transcription
+        raw = b"".join(frames)
+        audio_array = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
 
-            segments, _ = self.model.transcribe(
-                tmp.name, language="en", initial_prompt=self._initial_prompt,
-            )
-            text = " ".join(seg.text.strip() for seg in segments).strip()
-            return self._fix_medication_names(text)
+        segments, _ = self.model.transcribe(
+            audio_array,
+            language="en",
+            beam_size=1,
+            initial_prompt=self._initial_prompt,
+        )
+        text = " ".join(seg.text.strip() for seg in segments).strip()
+        return self._fix_medication_names(text)
 
     def _fix_medication_names(self, text: str) -> str:
         """Replace words in text that fuzzy-match a known medication name."""
