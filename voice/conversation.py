@@ -5,6 +5,7 @@ from llm.intent_classifier import classify_intent
 from llm.ollama_client import OllamaClient
 from medication.manager import MedicationManager
 from voice.listener import SpeechListener
+from voice.tts import PiperTTS
 
 
 MEDICATION_CONTEXT_TEMPLATE = """\
@@ -113,6 +114,7 @@ def start_voice_conversation(manager: MedicationManager):
     med_names = [m.name for m in manager.get_all_medications()]
     listener = SpeechListener(medication_names=med_names)
     client = OllamaClient()
+    tts = PiperTTS()
 
     exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
 
@@ -126,6 +128,7 @@ def start_voice_conversation(manager: MedicationManager):
 
             if text.strip().lower() in exit_words:
                 print("  Aloxa: Goodbye!")
+                tts.speak("Goodbye!")
                 break
 
             intent = classify_intent(text)
@@ -147,6 +150,7 @@ def start_voice_conversation(manager: MedicationManager):
                 reply = client.chat(text)
 
             print(f"  Aloxa: {reply}\n")
+            tts.speak(reply)
     except KeyboardInterrupt:
         print("\n  Conversation ended.")
     finally:

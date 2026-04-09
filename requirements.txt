@@ -10,6 +10,7 @@ idna==3.11
 numpy==2.4.4
 ollama==0.6.1
 PyAudio==0.2.14
+piper-tts
 pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5

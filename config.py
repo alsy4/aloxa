@@ -17,6 +17,10 @@ WHISPER_MODEL = "small"
 AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
 
+# Piper TTS
+PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-high.onnx")
+PIPER_SPEAKER_ID = None  # None = default speaker; set to int for multi-speaker models
+
 # Ollama LLM
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "qwen2.5:0.5b"
