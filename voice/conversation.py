@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 
+from llm.intent_classifier import classify_intent
 from llm.ollama_client import OllamaClient
 from medication.manager import MedicationManager
 from voice.listener import SpeechListener
@@ -16,7 +17,7 @@ TODAY'S INTAKE LOG:
 {intake_log}
 
 PENDING REMINDERS (not yet taken):
-{pending}
+{pending}p
 
 INSTRUCTIONS:
 - When the user asks about their medications, reminders, or intake history, answer using the data above.
@@ -127,10 +128,24 @@ def start_voice_conversation(manager: MedicationManager):
                 print("  Aloxa: Goodbye!")
                 break
 
-            print("  Aloxa is thinking...")
-            context = _build_medication_context(manager)
-            reply = client.chat(text, extra_context=context)
-            reply = _process_taken_tags(reply, manager)
+            intent = classify_intent(text)
+            print(f"  [Intent: {intent}]")
+
+            if intent == "HEALTH":
+                print("  [Routing to Watson API]")
+                reply = "This is a health-related query. Routing to Watson API..."
+            elif intent == "WEATHER":
+                print("  [Routing to Weather API]")
+                reply = "This is a weather-related query. Routing to Weather API..."
+            elif intent == "MEDICATION":
+                print("  Aloxa is thinking...")
+                context = _build_medication_context(manager)
+                reply = client.chat(text, extra_context=context)
+                reply = _process_taken_tags(reply, manager)
+            else:
+                print("  Aloxa is thinking...")
+                reply = client.chat(text)
+
             print(f"  Aloxa: {reply}\n")
     except KeyboardInterrupt:
         print("\n  Conversation ended.")
