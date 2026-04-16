@@ -24,6 +24,11 @@ AUDIO_CHANNELS = 1
 PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-high.onnx")
 PIPER_SPEAKER_ID = None  # None = default speaker; set to int for multi-speaker models
 
+# Weather API (weatherapi.com)
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "")
+WEATHER_API_URL = "http://api.weatherapi.com/v1"
+WEATHER_DEFAULT_LOCATION = os.getenv("WEATHER_DEFAULT_LOCATION", "Sheffield")
+
 # WatsonX API (health queries)
 WATSONX_API_KEY = os.getenv("WATSONX_API_KEY", "")
 WATSONX_PROJECT_ID = os.getenv("WATSONX_PROJECT_ID", "")

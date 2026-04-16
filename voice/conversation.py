@@ -8,6 +8,7 @@ from llm.watson_client import WatsonHealthClient
 from medication.manager import MedicationManager
 from voice.listener import SpeechListener
 from voice.tts import PiperTTS
+from weather.client import WeatherClient
 
 
 MEDICATION_CONTEXT_TEMPLATE = """\
@@ -122,6 +123,7 @@ def _route_intent(
     manager: MedicationManager,
     client: OllamaClient,
     health_client: WatsonHealthClient,
+    weather_client: WeatherClient,
 ) -> str:
     """Classify intent and route to the appropriate handler. Returns the reply."""
     with ThreadPoolExecutor(max_workers=2) as pool:
@@ -137,7 +139,7 @@ def _route_intent(
             reply = health_client.ask(text, medication_context=med_summary)
         elif intent == "WEATHER":
             print("  [Routing to Weather API]")
-            reply = "This is a weather-related query. Routing to Weather API..."
+            reply = weather_client.get_summary()
         elif intent == "MEDICATION":
             print("  Aloxa is thinking...")
             context = context_future.result()
@@ -162,6 +164,7 @@ def start_voice_conversation(manager: MedicationManager):
     listener = SpeechListener(medication_names=med_names)
     client = OllamaClient()
     health_client = WatsonHealthClient()
+    weather_client = WeatherClient()
     tts = PiperTTS()
 
     exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
@@ -180,7 +183,7 @@ def start_voice_conversation(manager: MedicationManager):
                 tts.speak("Goodbye!")
                 break
 
-            reply = _route_intent(text, med_names, manager, client, health_client)
+            reply = _route_intent(text, med_names, manager, client, health_client, weather_client)
             print(f"  Aloxa: {reply}\n")
             tts.speak(reply)
     except KeyboardInterrupt:
@@ -200,6 +203,7 @@ def start_text_conversation(manager: MedicationManager):
     med_names = [m.name for m in manager.get_all_medications()]
     client = OllamaClient()
     health_client = WatsonHealthClient()
+    weather_client = WeatherClient()
 
     exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
 
@@ -214,7 +218,7 @@ def start_text_conversation(manager: MedicationManager):
                 print("  Aloxa: Goodbye!\n")
                 break
 
-            reply = _route_intent(text, med_names, manager, client, health_client)
+            reply = _route_intent(text, med_names, manager, client, health_client, weather_client)
             print(f"  Aloxa: {reply}\n")
     except (KeyboardInterrupt, EOFError):
         print("\n  Conversation ended.")
