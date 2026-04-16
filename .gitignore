@@ -4,5 +4,8 @@ FR-implementation.md
 settings.local.json
 .claude
 
+# Environment
+.env
+
 #Python files
 __pycache__

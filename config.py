@@ -1,6 +1,9 @@
 import os
 
+from dotenv import load_dotenv
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 DB_PATH = os.path.join(BASE_DIR, "data", "aloxa.db")
 
 # How long (seconds) before a pending reminder is marked as missed
@@ -20,6 +23,22 @@ AUDIO_CHANNELS = 1
 # Piper TTS
 PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-high.onnx")
 PIPER_SPEAKER_ID = None  # None = default speaker; set to int for multi-speaker models
+
+# WatsonX API (health queries)
+WATSONX_API_KEY = os.getenv("WATSONX_API_KEY", "")
+WATSONX_PROJECT_ID = os.getenv("WATSONX_PROJECT_ID", "")
+WATSONX_URL = "https://eu-gb.ml.cloud.ibm.com"
+WATSONX_MODEL = "ibm/granite-ttm-1536-96-r2"
+WATSONX_HEALTH_SYSTEM_PROMPT = (
+    "You are Aloxa, a friendly health companion on a Raspberry Pi. "
+    "The user will ask health-related questions. You may also receive their current medication list for context.\n\n"
+    "RESPONSE RULES:\n"
+    "- Reply in 1-3 short sentences maximum. No lists or bullet points.\n"
+    "- Use simple, everyday words. No jargon.\n"
+    "- Your responses are spoken aloud, so write exactly how you would say it.\n"
+    "- Do not fabricate medication details or dosages.\n"
+    "- Always end with: 'Please check with your doctor.'\n"
+)
 
 # Ollama LLM
 OLLAMA_BASE_URL = "http://localhost:11434"

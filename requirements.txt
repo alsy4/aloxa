@@ -1,4 +1,6 @@
 annotated-types==0.7.0
+ibm-watsonx-ai
+python-dotenv
 anyio==4.13.0
 certifi==2026.2.25
 cffi==2.0.0

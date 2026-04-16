@@ -4,6 +4,7 @@ from datetime import datetime
 
 from llm.intent_classifier import classify_intent
 from llm.ollama_client import OllamaClient
+from llm.watson_client import WatsonHealthClient
 from medication.manager import MedicationManager
 from voice.listener import SpeechListener
 from voice.tts import PiperTTS
@@ -106,8 +107,51 @@ def _process_taken_tags(response: str, manager: MedicationManager) -> str:
     return clean
 
 
+def _build_medication_summary(manager: MedicationManager) -> str:
+    """Build a short medication summary (names + dosages) for health query context."""
+    meds = manager.get_all_medications()
+    if not meds:
+        return ""
+    lines = [f"- {m.name} {m.dosage}" for m in meds]
+    return "\n".join(lines)
+
+
+def _route_intent(
+    text: str,
+    med_names: list[str],
+    manager: MedicationManager,
+    client: OllamaClient,
+    health_client: WatsonHealthClient,
+) -> str:
+    """Classify intent and route to the appropriate handler. Returns the reply."""
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        intent_future = pool.submit(classify_intent, text, med_names)
+        context_future = pool.submit(_build_medication_context, manager)
+
+        intent = intent_future.result()
+        print(f"  [Intent: {intent}]")
+
+        if intent == "HEALTH":
+            print("  [Routing to WatsonX API]")
+            med_summary = _build_medication_summary(manager)
+            reply = health_client.ask(text, medication_context=med_summary)
+        elif intent == "WEATHER":
+            print("  [Routing to Weather API]")
+            reply = "This is a weather-related query. Routing to Weather API..."
+        elif intent == "MEDICATION":
+            print("  Aloxa is thinking...")
+            context = context_future.result()
+            reply = client.chat(text, extra_context=context)
+            reply = _process_taken_tags(reply, manager)
+        else:
+            print("  Aloxa is thinking...")
+            reply = client.chat(text)
+
+    return reply
+
+
 def start_voice_conversation(manager: MedicationManager):
-    """Voice conversation loop: speak → STT → Ollama (with medication context) → print response.
+    """Voice conversation loop: speak → STT → intent → LLM → TTS.
 
     Say "stop", "exit", or "quit" to end the conversation.
     """
@@ -117,6 +161,7 @@ def start_voice_conversation(manager: MedicationManager):
     med_names = [m.name for m in manager.get_all_medications()]
     listener = SpeechListener(medication_names=med_names)
     client = OllamaClient()
+    health_client = WatsonHealthClient()
     tts = PiperTTS()
 
     exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
@@ -129,39 +174,47 @@ def start_voice_conversation(manager: MedicationManager):
 
             print(f"  You: {text}")
 
-            # Strip punctuation and check if any word is an exit word
             words = re.sub(r"[^\w\s]", "", text.lower()).split()
             if words and set(words) & exit_words:
                 print("  Aloxa: Goodbye!")
                 tts.speak("Goodbye!")
                 break
 
-            # Run intent classification and medication context building in parallel
-            with ThreadPoolExecutor(max_workers=2) as pool:
-                intent_future = pool.submit(classify_intent, text, med_names)
-                context_future = pool.submit(_build_medication_context, manager)
-
-                intent = intent_future.result()
-                print(f"  [Intent: {intent}]")
-
-                if intent == "HEALTH":
-                    print("  [Routing to Watson API]")
-                    reply = "This is a health-related query. Routing to Watson API..."
-                elif intent == "WEATHER":
-                    print("  [Routing to Weather API]")
-                    reply = "This is a weather-related query. Routing to Weather API..."
-                elif intent == "MEDICATION":
-                    print("  Aloxa is thinking...")
-                    context = context_future.result()
-                    reply = client.chat(text, extra_context=context)
-                    reply = _process_taken_tags(reply, manager)
-                else:
-                    print("  Aloxa is thinking...")
-                    reply = client.chat(text)
-
+            reply = _route_intent(text, med_names, manager, client, health_client)
             print(f"  Aloxa: {reply}\n")
             tts.speak(reply)
     except KeyboardInterrupt:
         print("\n  Conversation ended.")
     finally:
         listener.close()
+
+
+def start_text_conversation(manager: MedicationManager):
+    """Text conversation loop: type → intent → LLM → print response.
+
+    Type "stop", "exit", or "quit" to end the conversation.
+    """
+    print("\n  Starting text conversation with Aloxa...")
+    print("  Type 'stop', 'exit', or 'quit' to end.\n")
+
+    med_names = [m.name for m in manager.get_all_medications()]
+    client = OllamaClient()
+    health_client = WatsonHealthClient()
+
+    exit_words = {"stop", "exit", "quit", "bye", "goodbye"}
+
+    try:
+        while True:
+            text = input("  You: ").strip()
+            if not text:
+                continue
+
+            words = re.sub(r"[^\w\s]", "", text.lower()).split()
+            if words and set(words) & exit_words:
+                print("  Aloxa: Goodbye!\n")
+                break
+
+            reply = _route_intent(text, med_names, manager, client, health_client)
+            print(f"  Aloxa: {reply}\n")
+    except (KeyboardInterrupt, EOFError):
+        print("\n  Conversation ended.")
