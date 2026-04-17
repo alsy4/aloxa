@@ -1,4 +1,5 @@
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -126,29 +127,37 @@ def _route_intent(
     weather_client: WeatherClient,
 ) -> str:
     """Classify intent and route to the appropriate handler. Returns the reply."""
+    t0 = time.time()
+
     with ThreadPoolExecutor(max_workers=2) as pool:
         intent_future = pool.submit(classify_intent, text, med_names)
         context_future = pool.submit(_build_medication_context, manager)
 
         intent = intent_future.result()
-        print(f"  [Intent: {intent}]")
+        t_intent = time.time()
+        print(f"  [Intent: {intent}] ({t_intent - t0:.2f}s)")
 
         if intent == "HEALTH":
             print("  [Routing to WatsonX API]")
             med_summary = _build_medication_summary(manager)
             reply = health_client.ask(text, medication_context=med_summary)
+            print(f"  [WatsonX response: {time.time() - t_intent:.2f}s]")
         elif intent == "WEATHER":
             print("  [Routing to Weather API]")
             reply = weather_client.get_summary()
+            print(f"  [Weather response: {time.time() - t_intent:.2f}s]")
         elif intent == "MEDICATION":
             print("  Aloxa is thinking...")
             context = context_future.result()
             reply = client.chat(text, extra_context=context)
             reply = _process_taken_tags(reply, manager)
+            print(f"  [Ollama response: {time.time() - t_intent:.2f}s]")
         else:
             print("  Aloxa is thinking...")
             reply = client.chat(text)
+            print(f"  [Ollama response: {time.time() - t_intent:.2f}s]")
 
+    print(f"  [Total routing: {time.time() - t0:.2f}s]")
     return reply
 
 
@@ -171,10 +180,13 @@ def start_voice_conversation(manager: MedicationManager):
 
     try:
         while True:
+            t_start = time.time()
             text = listener.listen()
             if not text:
                 continue
 
+            t_stt = time.time()
+            print(f"  [STT: {t_stt - t_start:.2f}s]")
             print(f"  You: {text}")
 
             words = re.sub(r"[^\w\s]", "", text.lower()).split()
@@ -184,8 +196,12 @@ def start_voice_conversation(manager: MedicationManager):
                 break
 
             reply = _route_intent(text, med_names, manager, client, health_client, weather_client)
-            print(f"  Aloxa: {reply}\n")
+            print(f"  Aloxa: {reply}")
+
+            t_tts_start = time.time()
             tts.speak(reply)
+            print(f"  [TTS: {time.time() - t_tts_start:.2f}s]")
+            print(f"  [Total turn: {time.time() - t_start:.2f}s]\n")
     except KeyboardInterrupt:
         print("\n  Conversation ended.")
     finally:

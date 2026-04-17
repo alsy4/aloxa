@@ -16,7 +16,7 @@ SCHEDULER_POLL_INTERVAL = 30
 REMINDER_REPEAT_DELAY_SECONDS = 5 * 60  # 5 minutes
 
 # Speech recognition (Whisper)
-WHISPER_MODEL = "base"
+WHISPER_MODEL = "tiny"
 AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
 
@@ -43,6 +43,7 @@ WATSONX_HEALTH_SYSTEM_PROMPT = (
     "- Your responses are spoken aloud, so write exactly how you would say it.\n"
     "- Do not fabricate medication details or dosages.\n"
     "- Always end with: 'Please check with your doctor.'\n"
+    "- DO NOT USE EMOJIS \n"
 )
 
 # Ollama LLM
