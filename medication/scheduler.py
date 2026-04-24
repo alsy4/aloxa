@@ -2,6 +2,7 @@ import threading
 import time
 from datetime import datetime
 
+import compartment_leds
 from config import SCHEDULER_POLL_INTERVAL
 from medication.manager import MedicationManager
 
@@ -27,6 +28,7 @@ class ReminderScheduler:
     def start(self):
         self._running = True
         self._populate_today()
+        compartment_leds.refresh()
         t = threading.Thread(target=self._loop, daemon=True)
         t.start()
         print("[Scheduler] Started — monitoring reminder times.")
