@@ -181,6 +181,8 @@ def start_voice_conversation(manager: MedicationManager):
     try:
         while True:
             t_start = time.time()
+            med_names = [m.name for m in manager.get_all_medications()]
+            listener.set_medication_names(med_names)
             text = listener.listen()
             if not text:
                 continue
