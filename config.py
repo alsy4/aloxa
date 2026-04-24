@@ -21,7 +21,7 @@ AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
 
 # Piper TTS
-PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-high.onnx")
+PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-med.onnx")
 PIPER_SPEAKER_ID = None  # None = default speaker; set to int for multi-speaker models
 
 # Weather API (weatherapi.com)
@@ -33,7 +33,7 @@ WEATHER_DEFAULT_LOCATION = os.getenv("WEATHER_DEFAULT_LOCATION", "Sheffield")
 WATSONX_API_KEY = os.getenv("WATSONX_API_KEY", "")
 WATSONX_PROJECT_ID = os.getenv("WATSONX_PROJECT_ID", "")
 WATSONX_URL = "https://eu-gb.ml.cloud.ibm.com"
-WATSONX_MODEL = "ibm/granite-ttm-1536-96-r2"
+WATSONX_MODEL = "mistralai/mistral-small-3-1-24b-instruct-2503"
 WATSONX_HEALTH_SYSTEM_PROMPT = (
     "You are Aloxa, a friendly health companion on a Raspberry Pi. "
     "The user will ask health-related questions. You may also receive their current medication list for context.\n\n"
@@ -48,7 +48,7 @@ WATSONX_HEALTH_SYSTEM_PROMPT = (
 
 # Ollama LLM
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "gemma3:1b"
+OLLAMA_MODEL = "qwen2.5:0.5b"
 OLLAMA_SYSTEM_PROMPT = (
     "You are Aloxa, a friendly health companion on a Raspberry Pi. "
     "You help with medication reminders, health questions, weather, time, and casual chat.\n\n"

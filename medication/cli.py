@@ -18,14 +18,23 @@ def _parse_times(raw: str) -> list[str] | None:
 
 
 def print_medications(manager: MedicationManager):
+    print(f"  Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     meds = manager.get_all_medications()
     if not meds:
         print("  No medications registered.")
         return
-    for med in meds:
-        times = ", ".join(med.scheduled_times) or "none"
-        info = f" ({med.information})" if med.information else ""
-        print(f"  [{med.id}] {med.name} {med.dosage} — {times}{info}")
+
+    for container in ("A", "B"):
+        print(f"\n  ┌─ Container {container} " + "─" * 40)
+        in_container = [m for m in meds if m.container == container]
+        if not in_container:
+            print("  │  (empty)")
+        else:
+            for med in in_container:
+                times = ", ".join(med.scheduled_times) or "none"
+                info = f" ({med.information})" if med.information else ""
+                print(f"  │  [{med.id}] {med.name} {med.dosage} — {times}{info}")
+        print("  └" + "─" * 52)
 
 
 def add_medication(manager: MedicationManager):
@@ -46,7 +55,12 @@ def add_medication(manager: MedicationManager):
     if times is None:
         return
 
-    med_id = manager.add_medication(name, dosage, information, times)
+    container = input("  Container (A/B): ").strip().upper()
+    if container not in ("A", "B"):
+        print("  Container must be 'A' or 'B'.")
+        return
+
+    med_id = manager.add_medication(name, dosage, information, times, container)
     print(f"  Registered '{name}' (id={med_id})")
 
 
@@ -148,14 +162,16 @@ def load_mock_data(manager: MedicationManager):
     # A time 30 minutes from now — won't fire yet
     future_time = (now + timedelta(minutes=30)).strftime("%H:%M")
 
-    manager.add_medication("Paracetamol", "500mg", "Take with water", [past_time])
-    manager.add_medication("Vitamin D", "1000 IU", "Take with food", [past_time, future_time])
-    manager.add_medication("Ibuprofen", "200mg", "Take after meal", [future_time])
+    manager.add_medication("Paracetamol", "500mg", "Take with water", [past_time], container="A")
+    manager.add_medication("Vitamin D", "1000 IU", "Take with food", [past_time, future_time], container="A")
+    manager.add_medication("Ibuprofen", "200mg", "Take after meal", [past_time], container="B")
+    manager.add_medication("Aspirin", "75mg", "Take with food", [future_time], container="B")
 
     print(f"  Mock data loaded.")
-    print(f"  Paracetamol  — due at {past_time} (should alert NOW and repeat every 5 min)")
-    print(f"  Vitamin D    — due at {past_time} (should alert NOW) + {future_time} (later)")
-    print(f"  Ibuprofen    — due at {future_time} (not yet)")
+    print(f"  [A] Paracetamol  — due at {past_time} (should alert NOW and repeat every 5 min)")
+    print(f"  [A] Vitamin D    — due at {past_time} (should alert NOW) + {future_time} (later)")
+    print(f"  [B] Ibuprofen    — due at {past_time} (should alert NOW)")
+    print(f"  [B] Aspirin      — due at {future_time} (not yet)")
 
 
 def reset_all_data(manager: MedicationManager):
