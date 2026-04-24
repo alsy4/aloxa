@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import compartment_leds
 from config import MISSED_TIMEOUT_SECONDS, REMINDER_REPEAT_DELAY_SECONDS
 from database import get_connection
 from medication.models import Medication
@@ -10,12 +11,15 @@ class MedicationManager:
     # ── CRUD ────────────────────────────────────────────────
 
     def add_medication(self, name: str, dosage: str, information: str,
-                       times: list[str]) -> int:
-        """Register a medication with one or more scheduled times (HH:MM)."""
+                       times: list[str], container: str = "A") -> int:
+        """Register a medication with one or more scheduled times (HH:MM).
+        container must be 'A' or 'B'."""
+        if container not in ("A", "B"):
+            raise ValueError(f"container must be 'A' or 'B', got {container!r}")
         conn = get_connection()
         cursor = conn.execute(
-            "INSERT INTO medications (name, dosage, information) VALUES (?, ?, ?)",
-            (name, dosage, information),
+            "INSERT INTO medications (name, dosage, information, container) VALUES (?, ?, ?, ?)",
+            (name, dosage, information, container),
         )
         med_id = cursor.lastrowid
         for t in times:
@@ -42,6 +46,7 @@ class MedicationManager:
                 name=row["name"],
                 dosage=row["dosage"],
                 information=row["information"],
+                container=row["container"],
                 scheduled_times=[t["scheduled_time"] for t in times],
             ))
         conn.close()
@@ -65,6 +70,7 @@ class MedicationManager:
             name=row["name"],
             dosage=row["dosage"],
             information=row["information"],
+            container=row["container"],
             scheduled_times=[t["scheduled_time"] for t in times],
         )
 
@@ -72,8 +78,10 @@ class MedicationManager:
         """Update medication fields. Pass times=["HH:MM",...] to replace scheduled times."""
         conn = get_connection()
         # Update core fields
-        allowed = {"name", "dosage", "information"}
+        allowed = {"name", "dosage", "information", "container"}
         updates = {k: v for k, v in fields.items() if k in allowed}
+        if "container" in updates and updates["container"] not in ("A", "B"):
+            raise ValueError(f"container must be 'A' or 'B', got {updates['container']!r}")
         if updates:
             set_clause = ", ".join(f"{k} = ?" for k in updates)
             conn.execute(
@@ -104,12 +112,15 @@ class MedicationManager:
         conn.execute("DELETE FROM medications")
         conn.commit()
         conn.close()
+        compartment_leds.refresh()
 
     def delete_medication(self, med_id: int) -> bool:
         conn = get_connection()
         cursor = conn.execute("DELETE FROM medications WHERE id = ?", (med_id,))
         conn.commit()
         conn.close()
+        if cursor.rowcount > 0:
+            compartment_leds.refresh()
         return cursor.rowcount > 0
 
     # ── Intake logging ──────────────────────────────────────
@@ -138,6 +149,7 @@ class MedicationManager:
         conn.commit()
         log_id = cursor.lastrowid
         conn.close()
+        compartment_leds.refresh()
         return log_id
 
     def mark_taken(self, log_id: int):
@@ -149,6 +161,7 @@ class MedicationManager:
         )
         conn.commit()
         conn.close()
+        compartment_leds.refresh()
 
     def mark_missed(self, log_id: int):
         """Mark a pending reminder as missed."""
@@ -159,18 +172,22 @@ class MedicationManager:
         )
         conn.commit()
         conn.close()
+        compartment_leds.refresh()
 
     def expire_stale_reminders(self):
         """Mark all pending reminders older than MISSED_TIMEOUT_SECONDS as missed."""
         cutoff = datetime.now() - timedelta(seconds=MISSED_TIMEOUT_SECONDS)
         conn = get_connection()
-        conn.execute(
+        cursor = conn.execute(
             "UPDATE intake_log SET status = 'missed', responded_at = CURRENT_TIMESTAMP "
             "WHERE status = 'pending' AND reminded_at <= ?",
             (cutoff.strftime("%Y-%m-%d %H:%M:%S"),),
         )
         conn.commit()
+        changed = cursor.rowcount
         conn.close()
+        if changed:
+            compartment_leds.refresh()
 
     def get_intake_history(self, medication_id: int, date: str | None = None) -> list[dict]:
         """Return intake log entries. If date given (YYYY-MM-DD), filter to that day."""
