@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS medications (
     name TEXT NOT NULL,
     dosage TEXT NOT NULL,
     information TEXT,
+    container TEXT NOT NULL DEFAULT 'A' CHECK (container IN ('A', 'B')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
