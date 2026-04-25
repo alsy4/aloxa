@@ -1,0 +1,179 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Aloxa RAG Architecture" id="rag-arch">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Aloxa RAG Pipeline" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="10" width="400" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="laneA" value="Stage 1 — Corpus Build (offline)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="420" height="800" as="geometry"/>
+        </mxCell>
+        <mxCell id="laneB" value="Stage 2 — Index Build (offline)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="490" y="60" width="420" height="800" as="geometry"/>
+        </mxCell>
+        <mxCell id="laneC" value="Stage 3 + 4 — Retrieval &amp; Generation (runtime)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="940" y="60" width="420" height="800" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="nhs" value="NHS Website&#10;(www.nhs.uk/conditions)" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="120" y="110" width="180" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fetcher" value="build_health_corpus.py&#10;requests + BeautifulSoup&#10;UA: AloxaCorpusBuilder/1.0&#10;1s delay between fetches" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=center" vertex="1" parent="1">
+          <mxGeometry x="100" y="230" width="220" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="urls" value="CONDITIONS list (10 URLs)&#10;+ INDEX_PAGES (vitamins-and-minerals/)&#10;sub-pages auto-discovered" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="340" width="220" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="extract" value="extract_content()&#10;Drop nav/aside/footer/forms&#10;Walk h1-h4, p, li → Markdown" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=center" vertex="1" parent="1">
+          <mxGeometry x="100" y="440" width="220" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="md" value="data/health_corpus/&#10;&#10;conditions/*.md&#10;vitamins-and-minerals/*.md&#10;&#10;YAML frontmatter:&#10;source, title, fetched" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;size=15;align=left;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="100" y="560" width="220" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="laneAnote" value="Skipped if cached.&#10;Re-run with --force." style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#555555" vertex="1" parent="1">
+          <mxGeometry x="120" y="730" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="iter" value="iter_corpus()&#10;Read every *.md, parse frontmatter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center" vertex="1" parent="1">
+          <mxGeometry x="555" y="110" width="290" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="chunk" value="chunk_document()&#10;Section-aware (## H2 forces flush)&#10;Greedy pack to HEALTH_CHUNK_MAX_CHARS = 800&#10;Output: (section, text) chunks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center" vertex="1" parent="1">
+          <mxGeometry x="555" y="200" width="290" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="embedtxt" value="embedding_text()&#10;&quot;[title — section]\n\n&lt;text&gt;&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center" vertex="1" parent="1">
+          <mxGeometry x="555" y="320" width="290" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="st" value="SentenceTransformer&#10;all-MiniLM-L6-v2 (dim=384)&#10;batch=32, normalize_embeddings=True" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=center" vertex="1" parent="1">
+          <mxGeometry x="555" y="410" width="290" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sqlbuild" value="sqlite + sqlite-vec&#10;data/health_index.db (rebuilt)&#10;&#10;chunks(id, title, source, section, text)&#10;vec_chunks vec0( embedding float[384] )&#10;meta(model, dim, chunk_max, count)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;align=center" vertex="1" parent="1">
+          <mxGeometry x="555" y="520" width="290" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="laneBnote" value="Run: python3 scripts/build_health_index.py" style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#555555" vertex="1" parent="1">
+          <mxGeometry x="555" y="690" width="290" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="user" value="User (voice)" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
+          <mxGeometry x="1010" y="100" width="50" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="stt" value="Whisper STT&#10;(faster-whisper tiny, int8 CPU)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center" vertex="1" parent="1">
+          <mxGeometry x="1090" y="105" width="240" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="conv" value="voice/conversation.py&#10;_route_intent()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center" vertex="1" parent="1">
+          <mxGeometry x="1010" y="195" width="320" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="intent" value="Intent classifier&#10;(Ollama qwen2.5:0.5b)&#10;HEALTH ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="1">
+          <mxGeometry x="1100" y="270" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="watson" value="WatsonHealthClient.ask()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1010" y="380" width="320" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="retriever" value="HealthRetriever.retrieve()&#10;fastembed ONNX (MiniLM-L6-v2)&#10;encode + L2 normalize → query KNN&#10;sqlite-vec MATCH, k=3&#10;score = 1 − distance/2&#10;drop &lt; 0.35" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=center" vertex="1" parent="1">
+          <mxGeometry x="1010" y="445" width="320" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="prompt" value="Build prompt:&#10;system = WATSONX_HEALTH_SYSTEM_PROMPT&#10;+ USER'S CURRENT MEDICATIONS&#10;+ REFERENCE INFORMATION (top-k chunks)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center" vertex="1" parent="1">
+          <mxGeometry x="1010" y="585" width="320" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="llm" value="WatsonX ModelInference.chat&#10;mistralai/mistral-small-3-1-24b-instruct&#10;max_tokens=256, temperature=0.7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=center" vertex="1" parent="1">
+          <mxGeometry x="1010" y="685" width="320" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tts" value="Piper TTS → aplay&#10;(cori-med.onnx)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center" vertex="1" parent="1">
+          <mxGeometry x="1010" y="775" width="320" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf" edge="1" parent="1" source="nhs" target="fetcher">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;dashed=1" edge="1" parent="1" source="urls" target="fetcher">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf" edge="1" parent="1" source="fetcher" target="extract">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf" edge="1" parent="1" source="extract" target="md">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e5" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="md" target="iter">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="630"/>
+              <mxPoint x="430" y="140"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="iter" target="chunk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="chunk" target="embedtxt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="embedtxt" target="st">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="st" target="sqlbuild">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e10" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450" edge="1" parent="1" source="user" target="stt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00" edge="1" parent="1" source="stt" target="conv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00" edge="1" parent="1" source="conv" target="intent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="HEALTH" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00;fontSize=11" edge="1" parent="1" source="intent" target="watson">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" style="endArrow=classic;html=1;rounded=0;strokeColor=#9673a6" edge="1" parent="1" source="watson" target="retriever">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="query embedding (KNN)" style="endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#9673a6;dashed=1;fontSize=11" edge="1" parent="1" source="retriever" target="sqlbuild">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00" edge="1" parent="1" source="retriever" target="prompt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf" edge="1" parent="1" source="prompt" target="llm">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00" edge="1" parent="1" source="llm" target="tts">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" value="spoken reply" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450;fontSize=11" edge="1" parent="1" source="tts" target="user">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="800"/>
+              <mxPoint x="980" y="135"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
