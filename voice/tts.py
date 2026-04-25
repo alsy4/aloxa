@@ -1,8 +1,49 @@
+import re
 import subprocess
 import tempfile
 import wave
 
 from config import PIPER_MODEL_PATH, PIPER_SPEAKER_ID
+
+
+# Replacements that turn typographic punctuation into speech-friendly forms.
+_SPEECH_SUBSTITUTIONS = [
+    (re.compile(r"\s*[—–]\s*"), ", "),     # em / en dash → comma pause
+    (re.compile(r"…"), "."),                # ellipsis → period
+    (re.compile(r"\s*[•·]\s*"), ", "),      # bullets → comma pause
+    (re.compile(r"\s*&\s*"), " and "),
+]
+
+# Markdown / structural symbols Piper would otherwise read aloud literally.
+# Natural-prosody punctuation (. , ; : ! ? ( ) ' ") is intentionally kept.
+_STRIP_SYMBOLS_RE = re.compile(r"[*_~`#\[\]{}<>|\\^=+]")
+
+# Defensive emoji / pictograph strip (the system prompts forbid emoji, but
+# we don't want Piper to ever spell out a stray symbol).
+_EMOJI_RE = re.compile(
+    "["
+    "\U0001F300-\U0001FAFF"
+    "\U00002600-\U000027BF"
+    "\U0001F1E6-\U0001F1FF"
+    "]+",
+    flags=re.UNICODE,
+)
+
+_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def sanitize_for_speech(text: str) -> str:
+    """Strip / replace characters Piper would mispronounce or read literally."""
+    if not text:
+        return text
+    for pattern, repl in _SPEECH_SUBSTITUTIONS:
+        text = pattern.sub(repl, text)
+    text = _EMOJI_RE.sub("", text)
+    text = _STRIP_SYMBOLS_RE.sub(" ", text)
+    text = _WHITESPACE_RE.sub(" ", text).strip()
+    # Tidy up any " ," or " ." artefacts left after stripping.
+    text = re.sub(r"\s+([,.;:!?])", r"\1", text)
+    return text
 
 
 class PiperTTS:
@@ -26,6 +67,10 @@ class PiperTTS:
     def speak(self, text: str):
         """Synthesise text to a WAV file with Piper, then play it via aplay."""
         if not text or not text.strip():
+            return
+
+        text = sanitize_for_speech(text)
+        if not text:
             return
 
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
