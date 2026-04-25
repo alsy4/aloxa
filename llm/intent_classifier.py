@@ -3,21 +3,17 @@ import requests
 from config import CLASSIFY_PROMPT, MEDICATION_KEYWORDS, OLLAMA_BASE_URL, OLLAMA_MODEL
 
 
-def _keyword_match(text: str, medication_names: list[str] | None = None) -> bool:
-    """Check if text contains medication keywords or known medication names."""
-    text_lower = text.lower()
+def _keyword_match(text: str) -> bool:
+    """Check if text contains unambiguous CRUD / intake-log phrases.
 
-    # Check keyword phrases (multi-word first)
+    Drug-name mentions are NOT matched here — a user naming their medication
+    could be asking a HEALTH question ("what are the side effects of my
+    ramipril?"), so that judgment is delegated to the LLM.
+    """
+    text_lower = text.lower()
     for kw in MEDICATION_KEYWORDS:
         if kw in text_lower:
             return True
-
-    # Check registered medication names from the database
-    if medication_names:
-        for name in medication_names:
-            if name.lower() in text_lower:
-                return True
-
     return False
 
 
@@ -27,22 +23,25 @@ def classify_intent(
 ) -> str:
     """Classify user message into an intent category.
 
-    Uses keyword pre-filtering for medication queries, then falls back to Ollama.
-    medication_names: list of registered medication names from the DB for matching.
+    Uses keyword pre-filtering for clear CRUD/intake phrases, then falls back
+    to Ollama. medication_names is passed to the LLM only as recognition
+    context — it does not force a MEDICATION classification.
 
     Returns one of: MEDICATION, HEALTH, WEATHER, GENERAL.
     """
-    # Option 1: Keyword pre-filter — deterministic and instant
-    if _keyword_match(user_message, medication_names):
+    # Keyword pre-filter — deterministic and instant for obvious CRUD phrases
+    if _keyword_match(user_message):
         return "MEDICATION"
 
-    # Option 3: Inject medication names into the prompt so the LLM recognises them
+    # Provide the user's medication names as context so the LLM can recognise
+    # them, but let the prompt's rules decide the intent (HEALTH vs MEDICATION).
     prompt = CLASSIFY_PROMPT
     if medication_names:
         names_str = ", ".join(medication_names)
         prompt += (
-            f"\n\nThe user has these registered medications: {names_str}. "
-            "If the message refers to any of these, classify as MEDICATION."
+            f"\n\nContext: the user's registered medications are: {names_str}. "
+            "Use this only to recognise these drug names; it does not "
+            "determine the label — apply the rules and examples above."
         )
 
     # Option 2: temperature 0 for deterministic output
