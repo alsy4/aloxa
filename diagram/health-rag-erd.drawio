@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Health RAG ERD" id="rag-erd">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="720" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Aloxa — Health RAG Database (ERD)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="600" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="data/health_index.db  ·  SQLite + sqlite-vec extension" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="300" y="44" width="600" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="meta_h" value="meta&amp;nbsp;&amp;nbsp;&lt;i&gt;«config table»&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5b8db8;strokeColor=#3a6892;fontColor=#ffffff;fontStyle=1;fontSize=14;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="380" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="meta_key" value="&lt;b&gt;PK&lt;/b&gt;&amp;nbsp;&amp;nbsp;key : TEXT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2f8;strokeColor=#3a6892;fontStyle=1;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="132" width="380" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="meta_val" value="value : TEXT NOT NULL" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3a6892;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="380" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="meta_note" value="Sample rows&#10;• embed_model      → sentence-transformers/all-MiniLM-L6-v2&#10;• embed_dim        → 384&#10;• chunk_max_chars  → 800&#10;• chunk_count      → N (rebuilt each index run)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=11;align=left;verticalAlign=top;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="chunks_h" value="chunks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5b8db8;strokeColor=#3a6892;fontColor=#ffffff;fontStyle=1;fontSize=14;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="80" y="380" width="420" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="chunks_id" value="&lt;b&gt;PK&lt;/b&gt;&amp;nbsp;&amp;nbsp;id : INTEGER  (= vec_chunks.rowid)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2f8;strokeColor=#3a6892;fontStyle=1;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="412" width="420" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="chunks_title" value="title : TEXT NOT NULL" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3a6892;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="440" width="420" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="chunks_source" value="source : TEXT NOT NULL  (NHS page URL)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3a6892;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="468" width="420" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="chunks_section" value="section : TEXT NOT NULL  (H2 heading or '')" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3a6892;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="496" width="420" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="chunks_text" value="text : TEXT NOT NULL  (chunk body, ≤ 800 chars)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3a6892;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="524" width="420" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="vec_h" value="vec_chunks&amp;nbsp;&amp;nbsp;&lt;i&gt;«VIRTUAL TABLE USING vec0»&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#6a4b81;fontColor=#ffffff;fontStyle=1;fontSize=14;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="640" y="380" width="460" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="vec_rowid" value="&lt;b&gt;PK&lt;/b&gt;&amp;nbsp;&amp;nbsp;rowid : INTEGER  (implicit, = chunks.id)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f3eaf7;strokeColor=#6a4b81;fontStyle=1;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="640" y="412" width="460" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="vec_emb" value="embedding : FLOAT[384]  (L2-normalized; KNN via MATCH)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6a4b81;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10" vertex="1" parent="1">
+          <mxGeometry x="640" y="440" width="460" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="vec_note" value="Distance metric&#10;• sqlite-vec returns squared L2 distance.&#10;• Normalized vectors → cosine similarity = 1 − distance / 2.&#10;• Retriever filters score ≥ 0.35, returns top k=3." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5e9fb;strokeColor=#9673a6;fontSize=11;align=left;verticalAlign=top;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="640" y="490" width="460" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rel" value="1 : 1  ·  joined via rowid (no formal FK)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;endArrow=ERone;dashed=1;strokeColor=#3a6892;fontSize=11;fontStyle=2" edge="1" parent="1" source="chunks_id" target="vec_rowid">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="leg" value="Notation&#10;• Solid border = regular SQLite table&#10;• Purple = sqlite-vec virtual table (vec0)&#10;• Dashed edge = implicit join (rowid pairing, no foreign key)&#10;• meta is standalone — index configuration / provenance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbbbbb;align=left;verticalAlign=top;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="540" y="100" width="560" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="indexnote" value="Index lifecycle&#10;• `data/health_index.db` is unlinked and rebuilt by scripts/build_health_index.py.&#10;• Each chunk row inserted with INSERT INTO chunks(...) → cur.lastrowid is reused as the rowid for INSERT INTO vec_chunks(rowid, embedding).&#10;• Query path: encode query → vec_chunks MATCH ? AND k = ? ORDER BY distance → JOIN chunks ON chunks.id = vec_chunks.rowid." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbbbbb;align=left;verticalAlign=top;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="80" y="600" width="1020" height="100" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

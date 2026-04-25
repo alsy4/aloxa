@@ -1,0 +1,206 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Aloxa Architecture" id="aloxa-arch">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1520" pageHeight="1080" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Aloxa — System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="510" y="10" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="user" value="User" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="60" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="mic" value="Microphone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=center;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="140" y="160" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="speaker" value="Speaker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=center;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="140" y="270" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pi" value="Raspberry Pi  ·  On-Device (Offline)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=14;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="70" width="750" height="960" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="entrylbl" value="Voice Pipeline — Entry" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="320" y="100" width="710" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="stt" value="Speech-to-Text" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="555" y="130" width="240" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="intent" value="Intent Classification" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="555" y="200" width="240" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="router" value="Request Router" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="595" y="280" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="srvlbl" value="Local Services" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="320" y="395" width="710" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="conv" value="Conversational Assistant" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="330" y="430" width="240" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="rag" value="Health Knowledge Retrieval" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="780" y="430" width="240" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="medsvc" value="Medication Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="330" y="520" width="240" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="kb" value="Health Knowledge Base" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="780" y="520" width="240" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="meddb" value="Medication Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="330" y="620" width="240" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="sched" value="Reminder Scheduler" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="780" y="620" width="240" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="exitlbl" value="Voice Pipeline — Exit" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="320" y="755" width="710" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="reply" value="Response Composer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=2;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="395" y="790" width="560" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="tts" value="Text-to-Speech" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="395" y="870" width="560" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="online" value="Online  ·  Cloud Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=14;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="1090" y="70" width="400" height="380" as="geometry"/>
+        </mxCell>
+        <mxCell id="health" value="Health Q&amp;A Service" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="1115" y="120" width="350" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="weather" value="Weather Service" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="1115" y="280" width="350" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="actlane" value="Actuators  ·  GPIO Hardware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontStyle=1;fontSize=14;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="1090" y="490" width="400" height="430" as="geometry"/>
+        </mxCell>
+        <mxCell id="leds" value="Compartment LEDs" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="1115" y="540" width="350" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="servos" value="Pill Dispenser Servos" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=center;fontStyle=1;fontSize=13" vertex="1" parent="1">
+          <mxGeometry x="1115" y="710" width="350" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="leg" value="Legend&#10;green = local / on-device&#10;blue = cloud service&#10;orange = physical actuator&#10;dashed = background / event" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbbbbb;align=left;fontSize=11;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="40" y="900" width="220" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="eu1" value="speaks" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450;fontSize=11" edge="1" parent="1" source="user" target="mic">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eu2" value="hears" style="endArrow=classic;html=1;rounded=0;strokeColor=#b85450;fontSize=11" edge="1" parent="1" source="speaker" target="user">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ein" value="audio" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="mic" target="stt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eout" value="audio" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="tts" target="speaker">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="335" y="895"/>
+              <mxPoint x="335" y="295"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ep1" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="stt" target="intent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ep2" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="intent" target="router">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="er1" value="general / medication" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366;fontSize=11" edge="1" parent="1" source="router" target="conv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="er2" value="health" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366;fontSize=11" edge="1" parent="1" source="router" target="rag">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="er3" value="medication CRUD" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366;fontSize=11" edge="1" parent="1" source="router" target="medsvc">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="320"/>
+              <mxPoint x="450" y="550"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er4" value="weather" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="router" target="weather">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="320"/>
+              <mxPoint x="900" y="340"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ed1" style="endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="conv" target="meddb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ed2" style="endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="medsvc" target="meddb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ed3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="rag" target="kb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="erh" value="reference" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="rag" target="health">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ec1" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="conv" target="reply">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec2" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="medsvc" target="reply">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec3" value="answer" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="health" target="reply">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1060" y="180"/>
+              <mxPoint x="1060" y="815"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ec4" value="forecast" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;fontSize=11" edge="1" parent="1" source="weather" target="reply">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1060" y="340"/>
+              <mxPoint x="1060" y="815"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ettsr" style="endArrow=classic;html=1;rounded=0;strokeColor=#82b366" edge="1" parent="1" source="reply" target="tts">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="esd1" style="endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#82b366;dashed=1" edge="1" parent="1" source="sched" target="meddb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="esd2" value="voice alert" style="endArrow=classic;html=1;rounded=0;strokeColor=#d6b656;fontSize=11;dashed=1" edge="1" parent="1" source="sched" target="reply">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="esd3" value="reminder due" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00;fontSize=11" edge="1" parent="1" source="sched" target="leds">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="esd4" value="dispense" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00;fontSize=11" edge="1" parent="1" source="sched" target="servos">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
