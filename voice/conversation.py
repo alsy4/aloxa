@@ -6,6 +6,7 @@ from datetime import datetime
 from llm.intent_classifier import classify_intent
 from llm.ollama_client import OllamaClient
 from llm.watson_client import WatsonHealthClient
+from medication.intake_parser import format_intake_reply, parse_intake_report
 from medication.manager import MedicationManager
 from voice.listener import SpeechListener
 from voice.tts import PiperTTS
@@ -147,11 +148,24 @@ def _route_intent(
             reply = weather_client.get_summary()
             print(f"  [Weather response: {time.time() - t_intent:.2f}s]")
         elif intent == "MEDICATION":
-            print("  Aloxa is thinking...")
-            context = context_future.result()
-            reply = client.chat(text, extra_context=context)
-            reply = _process_taken_tags(reply, manager)
-            print(f"  [Ollama response: {time.time() - t_intent:.2f}s]")
+            # Try deterministic intake logging first — bypasses the LLM for the
+            # common "I took my X" case so the DB update is 100% reliable.
+            logged = parse_intake_report(text, manager)
+            if logged:
+                for e in logged:
+                    state = "pending" if e["was_pending"] else "ad-hoc"
+                    print(
+                        f"  [Intake logged: {e['name']} {e['dosage']} "
+                        f"@ {e['scheduled_time']} ({state})]"
+                    )
+                reply = format_intake_reply(logged)
+                print(f"  [Intake parser: {time.time() - t_intent:.2f}s]")
+            else:
+                print("  Aloxa is thinking...")
+                context = context_future.result()
+                reply = client.chat(text, extra_context=context)
+                reply = _process_taken_tags(reply, manager)
+                print(f"  [Ollama response: {time.time() - t_intent:.2f}s]")
         else:
             print("  Aloxa is thinking...")
             reply = client.chat(text)
