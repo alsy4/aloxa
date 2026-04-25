@@ -1,0 +1,69 @@
+---
+source: https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-c/
+title: Vitamin C - Vitamins and minerals
+fetched: 2026-04-24
+---
+
+# Vitamin C - Vitamins and minerals
+
+Vitamin C, also known as ascorbic acid, has several important functions.
+
+These include:
+
+- helping to protect cells and keeping them healthy
+
+- maintaining healthy skin, blood vessels, bones and cartilage
+
+- helping with wound healing
+
+Lack of vitamin C can lead to scurvy .
+
+### Good sources of vitamin C
+
+Vitamin C is found in a wide variety of fruit and vegetables.
+
+Good sources include:
+
+- citrus fruit, such as oranges and orange juice
+
+- peppers
+
+- strawberries
+
+- blackcurrants
+
+- broccoli
+
+- brussels sprouts
+
+- potatoes
+
+### How much vitamin C do I need?
+
+Adults aged 19 to 64 need 40mg of vitamin C a day.
+
+You should be able to get all the vitamin C you need from your daily diet.
+
+Vitamin C cannot be stored in the body, so you need it in your diet every day.
+
+### What happens if I take too much vitamin C?
+
+Taking large amounts (more than 1,000mg per day) of vitamin C can cause:
+
+- stomach pain
+
+- diarrhoea
+
+- flatulence
+
+These symptoms should disappear once you stop taking vitamin C supplements.
+
+### What does the Department of Health and Social Care advise?
+
+You should be able to get all the vitamin C you need by eating a varied and balanced diet.
+
+If you take vitamin C supplements, do not take too much as this could be harmful.
+
+Taking less than 1,000mg of vitamin C supplements a day is unlikely to cause any harm.
+
+Page last reviewed: 03 August 2020 Next review due: 03 August 2023

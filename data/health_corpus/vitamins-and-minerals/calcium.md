@@ -1,0 +1,53 @@
+---
+source: https://www.nhs.uk/conditions/vitamins-and-minerals/calcium/
+title: Calcium - Vitamins and minerals
+fetched: 2026-04-24
+---
+
+# Calcium - Vitamins and minerals
+
+Calcium has several important functions.
+
+These include:
+
+- helping build bones and keep teeth healthy
+
+- regulating muscle contractions, including your heartbeat
+
+- making sure blood clots normally
+
+A lack of calcium could lead to a condition called rickets in children, and osteomalacia or osteoporosis in later life.
+
+## Sources of calcium
+
+Sources of calcium include:
+
+- milk, cheese and other dairy foods
+
+- green leafy vegetables – such as curly kale, okra but not spinach (spinach does contain high levels of calcium but the body cannot digest it all)
+
+- soya drinks with added calcium
+
+- bread and anything made with fortified flour
+
+- fish where you eat the bones – such as sardines and pilchards
+
+## How much calcium do I need?
+
+Adults aged 19 to 64 and over need 700mg of calcium a day.
+
+You should be able to get all the calcium you need from your daily diet.
+
+## What happens if I take too much calcium?
+
+Taking high doses of calcium (more than 1,500mg a day) could lead to stomach pain and diarrhoea .
+
+## What does the Department of Health and Social Care advise?
+
+You should be able to get all the calcium you need by eating a varied and balanced diet.
+
+If you take calcium supplements, do not take too much as this could be harmful.
+
+Taking 1,500mg or less a day is unlikely to cause any harm.
+
+Page last reviewed: 03 August 2020 Next review due: 03 August 2023
