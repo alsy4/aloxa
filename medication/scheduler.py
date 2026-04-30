@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 
 import compartment_leds
+import compartment_servos
 from config import SCHEDULER_POLL_INTERVAL
 from medication.manager import MedicationManager
 
@@ -50,6 +51,7 @@ class ReminderScheduler:
             self.manager.record_alert(reminder["id"])
             alert_count = reminder["alert_count"] + 1
             self.on_alert(reminder, alert_count)
+            compartment_servos.rotate()
 
     def _loop(self):
         while self._running:
