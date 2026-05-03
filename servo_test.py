@@ -4,7 +4,7 @@ from gpiozero import Servo
 from gpiozero.pins.lgpio import LGPIOFactory
 from time import sleep
 
-SERVO1_GPIO = 17
+SERVO1_GPIO = 18
 SERVO2_GPIO = 27
 
 factory = LGPIOFactory()

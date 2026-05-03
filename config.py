@@ -21,7 +21,7 @@ AUDIO_RATE = 16000
 AUDIO_CHANNELS = 1
 
 # Piper TTS
-PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "cori-med.onnx")
+PIPER_MODEL_PATH = os.path.join(BASE_DIR, "models", "en_GB-northern_english_male-medium.onnx")
 PIPER_SPEAKER_ID = None  # None = default speaker; set to int for multi-speaker models
 
 # Weather API (weatherapi.com)
@@ -54,7 +54,7 @@ WATSONX_HEALTH_SYSTEM_PROMPT = (
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "qwen2.5:0.5b"
 
-# Intent classifier — unambiguous CRUD / intake-logging phrases that
+    # Intent classifier — unambiguous CRUD / intake-logging phrases that
 # short-circuit to MEDICATION without hitting the LLM. Knowledge-style
 # drug terms ("dose", "pill", "medicine", "prescription", etc.) are
 # intentionally excluded so they flow to the LLM and get routed to HEALTH.
