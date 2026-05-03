@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Pending reminders{% endblock %}
+{% block content %}
+  <h2>Pending reminders</h2>
+  {% if pending %}
+    <table class="data">
+      <thead><tr><th>Med</th><th>Scheduled</th><th>Reminded</th><th>Alerts</th><th></th></tr></thead>
+      <tbody>
+        {% for r in pending %}
+          <tr>
+            <td>{{ r.name }} <span class="muted">{{ r.dosage }}</span></td>
+            <td>{{ r.scheduled_time }}</td>
+            <td class="muted">{{ r.reminded_at }}</td>
+            <td>{{ r.alert_count }}</td>
+            <td class="actions">
+              <form method="post" action="{{ url_for('main.intake_taken', log_id=r.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn">Taken</button>
+              </form>
+              <form method="post" action="{{ url_for('main.intake_missed', log_id=r.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-warn">Missed</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No pending reminders.</p>
+  {% endif %}
+{% endblock %}

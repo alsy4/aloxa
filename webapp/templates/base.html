@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if session.get('authenticated') %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+  {% endif %}
+  <title>{% block title %}Aloxa{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+  <header>
+    <h1><a href="{{ url_for('main.index') }}">Aloxa</a></h1>
+    {% if session.get('authenticated') %}
+      <nav>
+        <a href="{{ url_for('main.index') }}">Dashboard</a>
+        <a href="{{ url_for('main.medications_list') }}">Medications</a>
+        <a href="{{ url_for('main.history') }}">History</a>
+      </nav>
+      <form method="post" action="{{ url_for('auth.logout') }}" class="logout-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-link">Log out</button>
+      </form>
+    {% endif %}
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <p class="flash flash-{{ category }}">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  {% if session.get('authenticated') %}
+    <script src="{{ url_for('static', filename='js/events.js') }}" defer></script>
+  {% endif %}
+</body>
+</html>

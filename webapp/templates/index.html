@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Aloxa — Dashboard{% endblock %}
+{% block content %}
+  <h2>Pending reminders</h2>
+  <table class="data" id="pending-table"{% if not pending %} style="display:none"{% endif %}>
+    <thead><tr><th>Med</th><th>Scheduled</th><th>Reminded</th><th></th></tr></thead>
+    <tbody>
+      {% for r in pending %}
+        <tr>
+          <td>{{ r.name }} <span class="muted">{{ r.dosage }}</span></td>
+          <td>{{ r.scheduled_time }}</td>
+          <td class="muted">{{ r.reminded_at }}</td>
+          <td class="actions">
+            <form method="post" action="{{ url_for('main.intake_taken', log_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn">Taken</button>
+            </form>
+            <form method="post" action="{{ url_for('main.intake_missed', log_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-warn">Missed</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted" id="pending-empty"{% if pending %} style="display:none"{% endif %}>No pending reminders.</p>
+
+  <h2>Recent intake</h2>
+  {% if recent %}
+    <table class="data">
+      <thead><tr><th>Med</th><th>Scheduled</th><th>Status</th><th>Responded</th></tr></thead>
+      <tbody>
+        {% for e in recent %}
+          <tr>
+            <td>{{ e.name }} <span class="muted">{{ e.dosage }}</span></td>
+            <td>{{ e.scheduled_time }}</td>
+            <td><span class="status status-{{ e.status }}">{{ e.status }}</span></td>
+            <td class="muted">{{ e.responded_at or "—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No intake events yet.</p>
+  {% endif %}
+
+  <h2>Quick actions</h2>
+  <p>
+    <a class="btn" href="{{ url_for('main.medications_new') }}">Add medication</a>
+    <a class="btn btn-secondary" href="{{ url_for('main.medications_list') }}">Manage medications ({{ med_count }})</a>
+  </p>
+
+  <details class="admin">
+    <summary>Admin</summary>
+    <form method="post" action="{{ url_for('main.admin_mock_data') }}"
+          onsubmit="return confirm('Reset all data and load mock medications?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-secondary">Load mock data</button>
+    </form>
+    <form method="post" action="{{ url_for('main.admin_reset') }}"
+          onsubmit="return confirm('Delete ALL medications and intake history?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-danger">Reset all data</button>
+    </form>
+  </details>
+{% endblock %}

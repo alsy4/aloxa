@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'new' %}Add medication{% else %}Edit {{ med.name }}{% endif %}{% endblock %}
+
+{% macro field(f) %}
+  <p>
+    {{ f.label }}
+    {{ f(class_='input') }}
+    {% if f.description %}<small class="muted">{{ f.description }}</small>{% endif %}
+    {% for err in f.errors %}<span class="err">{{ err }}</span>{% endfor %}
+  </p>
+{% endmacro %}
+
+{% block content %}
+  <h2>{% if mode == 'new' %}Add medication{% else %}Edit medication{% endif %}</h2>
+  <form method="post" class="form">
+    {{ form.hidden_tag() }}
+    {{ field(form.name) }}
+    {{ field(form.dosage) }}
+    {{ field(form.information) }}
+    {{ field(form.times) }}
+    <p>
+      {{ form.container.label }}
+      <span class="radios">
+        {% for sub in form.container %}
+          <label>{{ sub }} {{ sub.label.text }}</label>
+        {% endfor %}
+      </span>
+      {% for err in form.container.errors %}<span class="err">{{ err }}</span>{% endfor %}
+    </p>
+    <p>
+      {{ form.submit(class_='btn') }}
+      <a class="btn btn-secondary" href="{{ url_for('main.medications_list') }}">Cancel</a>
+    </p>
+  </form>
+{% endblock %}

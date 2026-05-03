@@ -1,3 +1,9 @@
+"""Standalone interactive CLI menu for Aloxa.
+
+The web UI launched via `python3 web.py` is the primary front-end. This
+file is kept as a terminal-only tool that reuses the same MedicationManager
+and scheduler.
+"""
 from database import init_db
 from medication import MedicationManager
 from medication.cli import (

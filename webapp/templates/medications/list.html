@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Medications{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <h2>Medications</h2>
+    <a class="btn" href="{{ url_for('main.medications_new') }}">Add medication</a>
+  </div>
+
+  {% if not meds %}
+    <p class="muted">No medications registered.</p>
+  {% else %}
+    {% for container in ['A', 'B'] %}
+      <h3>Container {{ container }}</h3>
+      {% set in_c = meds | selectattr('container', 'equalto', container) | list %}
+      {% if not in_c %}
+        <p class="muted">(empty)</p>
+      {% else %}
+        <table class="data">
+          <thead><tr><th>Name</th><th>Dosage</th><th>Times</th><th>Info</th><th></th></tr></thead>
+          <tbody>
+            {% for med in in_c %}
+              <tr>
+                <td>{{ med.name }}</td>
+                <td>{{ med.dosage }}</td>
+                <td>{{ med.scheduled_times | join(', ') or '—' }}</td>
+                <td class="muted">{{ med.information or '—' }}</td>
+                <td class="actions">
+                  <a class="btn btn-secondary" href="{{ url_for('main.medications_edit', med_id=med.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('main.medications_delete', med_id=med.id) }}"
+                        onsubmit="return confirm('Delete {{ med.name }}?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endblock %}

@@ -1,10 +1,9 @@
-"""Textual TUI sketch for Aloxa.
+"""Textual TUI for Aloxa.
 
-Run with:  python3 tui.py
-Requires:  pip install textual
-
-This is a sketch — the original CLI (main.py) is untouched. It reuses the
-existing MedicationManager so data + scheduler logic are shared.
+Standalone tool. The primary front-end is the Flask web UI launched via
+`python3 web.py`. `main.py` keeps the original interactive menu. Run this
+file directly (`python3 tui.py`) for the Textual terminal UI. Reuses
+MedicationManager so data + scheduler logic are shared.
 """
 from datetime import datetime
 

@@ -1,3 +1,6 @@
+"""Interactive CLI helpers used by the standalone main.py menu. The web UI
+launched via `python3 web.py` is the primary front-end; these helpers are
+kept for terminal-only access and scripting."""
 import re
 from datetime import datetime, timedelta
 

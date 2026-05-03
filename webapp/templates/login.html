@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Aloxa — Log in{% endblock %}
+{% block content %}
+  <h2>Log in</h2>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <p class="flash flash-{{ category }}">{{ msg }}</p>
+    {% endfor %}
+  {% endwith %}
+  <form method="post" class="form">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.password.label }}
+      {{ form.password(autofocus=true) }}
+    </p>
+    <p>{{ form.submit(class="btn") }}</p>
+  </form>
+{% endblock %}

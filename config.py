@@ -126,6 +126,12 @@ HEALTH_CHUNK_MAX_CHARS = 800
 HEALTH_RETRIEVAL_K = 3
 HEALTH_RETRIEVAL_MIN_SCORE = 0.35
 
+# Flask web UI
+FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-insecure-change-me")
+WEB_PASSWORD = os.getenv("WEB_PASSWORD", "aloxa")
+WEB_HOST = os.getenv("WEB_HOST", "0.0.0.0")
+WEB_PORT = int(os.getenv("WEB_PORT", "5000"))
+
 OLLAMA_SYSTEM_PROMPT = (
     "You are Aloxa, a friendly health companion on a Raspberry Pi. "
     "You help with medication reminders, health questions, weather, time, and casual chat.\n\n"

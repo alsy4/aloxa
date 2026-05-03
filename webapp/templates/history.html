@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Intake history{% endblock %}
+{% block content %}
+  <h2>Intake history</h2>
+
+  <form method="get" class="filters">
+    <label>
+      Medication
+      <select name="med">
+        <option value="">All</option>
+        {% for m in meds %}
+          <option value="{{ m.id }}" {% if med_filter == m.id %}selected{% endif %}>
+            {{ m.name }} ({{ m.dosage }})
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Date
+      <input type="date" name="date" value="{{ date_filter or '' }}">
+    </label>
+    <button class="btn" type="submit">Filter</button>
+    <a class="btn btn-secondary" href="{{ url_for('main.history') }}">Clear</a>
+  </form>
+
+  {% if entries %}
+    <table class="data">
+      <thead><tr><th>When</th><th>Med</th><th>Scheduled</th><th>Status</th><th>Responded</th></tr></thead>
+      <tbody>
+        {% for e in entries %}
+          <tr>
+            <td class="muted">{{ e.reminded_at }}</td>
+            <td>{{ e.name }} <span class="muted">{{ e.dosage }}</span></td>
+            <td>{{ e.scheduled_time }}</td>
+            <td><span class="status status-{{ e.status }}">{{ e.status }}</span></td>
+            <td class="muted">{{ e.responded_at or '—' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No intake history matching those filters.</p>
+  {% endif %}
+{% endblock %}
