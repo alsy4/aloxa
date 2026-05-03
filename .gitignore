@@ -10,3 +10,6 @@ settings.local.json
 #Python files
 __pycache__
 models
+
+
+*.drawio
