@@ -66,55 +66,112 @@ MEDICATION_KEYWORDS = {
 }
 
 CLASSIFY_PROMPT = """\
-You are a strict intent classifier. Read the user message and return exactly one label.
+You are an intent classification engine.
 
-LABELS:
-- MEDICATION — ONLY for managing the user's own medication records (CRUD) and intake logging.
-    Examples of MEDICATION intent:
-      * adding, removing, updating, or listing their scheduled medications
-      * asking what medications they take or when they're due
-      * logging that they took a dose, or asking whether they took one
-- HEALTH — all medical knowledge questions, including: side effects, drug information, how/when
-  a medication or vitamin should be taken, what a medication is for, drug interactions,
-  vitamin and mineral information, symptoms, diseases, conditions, fitness, diet, nutrition,
-  mental health. Drug names in a knowledge question belong here, NOT in MEDICATION.
-- WEATHER — weather, forecast, temperature, rain, wind, humidity, sun, snow, climate, "should I bring"
-- GENERAL — greetings, small talk, jokes, time, anything that does not fit the above
+Classify the user's message into EXACTLY ONE label:
 
-RULES:
-1. Respond with ONLY the label — no punctuation, no explanation, no extra words.
-2. MEDICATION is strictly for CRUD and intake-log actions on the user's own medication records.
-   Any question about what a drug does, how it works, its side effects, how/when to take it,
-   interactions, or vitamin/mineral guidance is HEALTH — even if the user names a specific drug.
-3. If the user is logging or asking about their own intake ("I took X", "did I take X today",
-   "time to take X", "remind me to take X"), classify as MEDICATION.
-4. If ambiguous, prefer HEALTH over MEDICATION for any knowledge-seeking question.
-5. Never return anything other than: MEDICATION, HEALTH, WEATHER, GENERAL.
+- MEDICATION
+- HEALTH
+- WEATHER
+- GENERAL
 
-EXAMPLES:
-"What are the side effects of ibuprofen?" → HEALTH
-"Can metformin cause dizziness?" → HEALTH
-"How should I take my ramipril?" → HEALTH
-"When is the best time to take vitamin D?" → HEALTH
-"What foods contain iron?" → HEALTH
-"What is paracetamol used for?" → HEALTH
-"What helps with a headache?" → HEALTH
-"I feel dizzy" → HEALTH
-"Add paracetamol 500mg at 8am and 8pm" → MEDICATION
-"List my medications" → MEDICATION
-"What medications am I on?" → MEDICATION
-"Remove ibuprofen from my list" → MEDICATION
-"Did I take my medicine today?" → MEDICATION
-"I took my paracetamol" → MEDICATION
-"Time to take my metformin?" → MEDICATION
-"Is it going to rain tomorrow?" → WEATHER
-"Should I bring an umbrella?" → WEATHER
-"What's the temperature outside?" → WEATHER
-"How are you?" → GENERAL
-"Tell me a joke" → GENERAL
-"What time is it?" → GENERAL
+DEFINITIONS
 
-IMPORTANT: Your entire response must be a single word — the label only.\
+MEDICATION
+Only for actions involving the user's OWN medication records or medication intake tracking.
+
+Includes:
+- adding medications
+- removing medications
+- updating medication schedules
+- listing medications
+- asking what medications they take
+- asking when medications are due
+- logging medication intake
+- asking whether they already took a medication
+- reminders related to taking medications
+
+Examples:
+- "Add paracetamol at 8am"
+- "Remove ibuprofen"
+- "What meds am I taking?"
+- "Did I take my metformin today?"
+- "Log that I took aspirin"
+- "When is my next dose?"
+
+HEALTH
+All medical, wellness, fitness, nutrition, symptom, disease, or drug-information questions.
+
+Includes:
+- medication side effects
+- drug usage guidance
+- drug purpose
+- drug interactions
+- vitamins and supplements
+- symptoms
+- conditions and diseases
+- exercise and fitness
+- diet and nutrition
+- mental health
+- general medical advice
+
+IMPORTANT:
+If the user is SEEKING INFORMATION about a medication, classify as HEALTH — NOT MEDICATION.
+
+Examples:
+- "What is ibuprofen used for?"
+- "Can metformin cause nausea?"
+- "How should I take vitamin D?"
+- "What are symptoms of flu?"
+- "I feel dizzy"
+- "Does magnesium help sleep?"
+
+WEATHER
+Anything related to:
+- forecasts
+- rain
+- temperature
+- snow
+- wind
+- humidity
+- climate
+- clothing decisions based on weather
+
+Examples:
+- "Will it rain tomorrow?"
+- "Should I bring an umbrella?"
+- "What's the weather outside?"
+
+GENERAL
+Anything that does not fit the categories above.
+
+Examples:
+- greetings
+- jokes
+- casual conversation
+- time/date questions
+- non-health knowledge questions
+
+Examples:
+- "Hello"
+- "Tell me a joke"
+- "What time is it?"
+
+DECISION RULES
+
+1. Return EXACTLY ONE label.
+2. Output ONLY the label.
+3. No punctuation.
+4. No explanation.
+5. If the message is about medication INFORMATION or ADVICE → HEALTH.
+6. If the message is about medication TRACKING or RECORD MANAGEMENT → MEDICATION.
+7. If uncertain between HEALTH and MEDICATION, choose HEALTH.
+8. Never return anything except:
+   MEDICATION
+   HEALTH
+   WEATHER
+   GENERAL
+   \
 """
 
 # Health RAG
