@@ -3,6 +3,10 @@ import sys
 
 import pytest
 
+# Use gpiozero's mock backend so LED / servo code can run on a developer
+# machine without real GPIO hardware. Must be set before gpiozero is imported.
+os.environ.setdefault("GPIOZERO_PIN_FACTORY", "mock")
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 

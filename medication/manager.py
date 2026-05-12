@@ -241,7 +241,7 @@ class MedicationManager:
 
     def get_due_alerts(self) -> list[dict]:
         """Return pending reminders whose scheduled time has passed and are due for
-        an alert — either never alerted or last alerted >= REMINDER_REPEAT_DELAY_SECONDS ago."""
+        an alert, either never alerted or last alerted >= REMINDER_REPEAT_DELAY_SECONDS ago."""
         now = datetime.now()
         today = now.strftime("%Y-%m-%d")
         current_time = now.strftime("%H:%M")
@@ -261,6 +261,7 @@ class MedicationManager:
             (today, current_time, cutoff),
         ).fetchall()
         conn.close()
+        
         return [dict(r) for r in rows]
 
     def record_alert(self, log_id: int):
