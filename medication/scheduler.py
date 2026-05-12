@@ -2,8 +2,8 @@ import threading
 import time
 from datetime import datetime
 
-import compartment_leds
-import compartment_servos
+import medication.compartment_leds as compartment_leds
+import medication.compartment_servos as compartment_servos
 from config import SCHEDULER_POLL_INTERVAL
 from medication.manager import MedicationManager
 

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-import compartment_leds
+import medication.compartment_leds as compartment_leds
 from config import MISSED_TIMEOUT_SECONDS, REMINDER_REPEAT_DELAY_SECONDS
 from database import get_connection
 from medication.models import Medication

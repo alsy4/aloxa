@@ -1,92 +1,76 @@
-An Overview File for Aloxa
+# Aloxa
 
-## Voice Conversation Flow
+Aloxa is a Raspberry Pi 5 medication-reminder companion. It tracks your medications, reminds you when to take them, logs whether each dose was taken or missed, and answers health, weather, and general questions through a voice or text conversation powered by a local LLM, cloud LLM, and a local health-knowledge RAG index.
 
-Below is the full flow when a user speaks to Aloxa (option 9 in the menu):
+## What It Does
 
+- Stores medications (name, dosage, information) and their scheduled times (HH:MM).
+- Generates a reminder event for every scheduled dose and tracks it through `pending → taken | missed` (auto-expires to `missed` after 3 hours).
+- Listens to the user through a USB microphone, transcribes speech with Whisper, classifies the intent, routes the request to the right backend (medication DB, health RAG + WatsonX, weather API, or local Ollama small-talk), and speaks the reply back through Piper TTS.
+- Drives per-compartment servos and LEDs so the correct medication compartment opens and lights up at reminder time.
+
+## Features
+
+- **Medication CRUD + intake logging** — add, update, delete medications and scheduled times; every reminder is logged.
+- **Reminder scheduler** (`medication/scheduler.py`) — polls every 30s, repeats unanswered alerts every 5min, expires pending events after 3h.
+- **Voice conversation** (menu option 9) — STT → intent classifier → routed reply → TTS.
+- **Text conversation** (menu option 10) — same routing pipeline without audio.
+- **Intent routing** — `MEDICATION`, `HEALTH`, `WEATHER`, `GENERAL`, with a keyword short-circuit list for medication queries.
+- **Health RAG** — local SQLite vector index over an NHS corpus, MiniLM embeddings, top-k=3, min score 0.35, fed into the WatsonX prompt.
+- **`[TAKEN: <med>]` tag parsing** — the LLM can mark a dose as taken inside its reply; the tag is stripped and `mark_taken` is called.
+- **Hardware control** — servo per compartment (`compartment_servos.py`) and LED per compartment (`compartment_leds.py`).
+- **Front-ends** — CLI menu (`main.py`) and TUI (`tui.py`).
+
+## Technologies
+
+- **Language / runtime:** Python 3 on Raspberry Pi 5 (Linux).
+- **Storage:** SQLite — `data/aloxa.db` (app data) and `data/health_index.db` (RAG vector index).
+- **STT:** `faster-whisper` (configurable model) at 16kHz mono via PyAudio. Vosk is also bundled as a legacy alternative.
+- **TTS:** `piper-tts` with `en_GB-northern_english_male-medium.onnx` and a custom `cori-med.onnx` voice.
+- **Local LLM:** Ollama at `http://localhost:11434` running `qwen2.5:0.5b` (intent classification and `GENERAL` / `MEDICATION` replies).
+- **Cloud LLM:** IBM WatsonX (`mistralai/mistral-small-3-1-24b-instruct-2503`, EU-GB region) for `HEALTH` replies.
+- **Embeddings:** `sentence-transformers/all-MiniLM-L6-v2` (384-dim).
+- **Weather:** weatherapi.com, default location Sheffield.
+- **Audio I/O:** PyAudio.
+- **Secrets:** `.env` — `WATSONX_API_KEY`, `WATSONX_PROJECT_ID`, `WEATHER_API_KEY`.
+
+## Hardware
+
+- MINI USB Microphone.
+- One servo per medication compartment.
+- One LED per medication compartment.
+
+## Project Layout
+
+- `config.py` — central constants (DB paths, timeouts, model names, prompts, API URLs).
+- `database/` — SQLite connection and `schema.sql`. Tables: `medications`, `medication_times`, `intake_log`.
+- `medication/` — data model, CRUD + intake logging, reminder scheduler, CLI helpers, intake parser.
+- `voice/` — Whisper listener with medication-name fuzzy fix, Piper TTS, voice/text conversation loop.
+- `llm/` — Ollama chat client, intent classifier, WatsonX client, health retriever (RAG).
+- `weather/` — weatherapi.com client.
+- `scripts/` — offline builders for the NHS health corpus and the RAG index.
+- `models/` — Piper voice ONNX files.
+- `tests/` — CRUD/unit tests with `conftest.py` fixtures.
+- `diagram/` — drawio files (system flow, class architecture, ERD, RAG, STT/TTS, intent classifier, use cases, Pi connections, power-interest grid).
+- `main.py` — entry point and CLI menu.
+
+## Running
+
+```bash
+python3 main.py
 ```
-User speaks into microphone
-│
-├─ main.py:36 — User selects option 9
-│   └─ calls start_voice_conversation(manager)
-│
-└─ voice/conversation.py:105 — start_voice_conversation()
-    │
-    ├─ :113 — manager.get_all_medications()
-    │   └─ medication/manager.py:31 — queries DB for all medication names
-    │
-    ├─ :114 — SpeechListener(medication_names=["Paracetamol", ...])
-    │   └─ voice/listener.py:24 — __init__()
-    │       ├─ :26 — WhisperModel("base", device="cpu", compute_type="int8")
-    │       └─ :28 — set_medication_names() → builds initial_prompt string
-    │
-    ├─ :115 — OllamaClient()
-    │   └─ llm/ollama_client.py:9 — __init__() with model + system prompt from config.py
-    │
-    └─ LOOP (:120)
-        │
-        ├─ :121 — listener.listen()
-        │   └─ voice/listener.py:35 — listen()
-        │       ├─ :41 — Opens PyAudio stream (16kHz, mono)
-        │       ├─ :55 — Records audio frames until silence detected
-        │       │         (RMS > 500 = speech, 30 silent chunks = stop)
-        │       ├─ :80 — Writes frames to temp .wav file
-        │       ├─ :87 — model.transcribe(wav, language="en", initial_prompt="Paracetamol, ...")
-        │       │         └─ faster-whisper returns segments
-        │       ├─ :90 — Joins segments into text string
-        │       └─ :91 — _fix_medication_names(text)
-        │           └─ :93 — Fuzzy-matches words against known medication names
-        │                    using difflib.get_close_matches (cutoff=0.6)
-        │
-        ├─ :125 — Prints "You: {text}"
-        │
-        ├─ :127 — Exit check ("stop", "exit", "quit", "bye", "goodbye")
-        │
-        ├─ :131 — classify_intent(text)
-        │   └─ llm/intent_classifier.py:38 — classify_intent()
-        │       ├─ Sends text to Ollama with CLASSIFY_PROMPT
-        │       │   └─ POST http://localhost:11434/api/chat
-        │       └─ Returns one of: MEDICATION, HEALTH, WEATHER, GENERAL
-        │
-        └─ ROUTING (:134)
-            │
-            ├─ HEALTH → :136 — "Routing to Watson API..." (stub)
-            │
-            ├─ WEATHER → :139 — "Routing to Weather API..." (stub)
-            │
-            ├─ MEDICATION → :141
-            │   ├─ _build_medication_context(manager)
-            │   │   └─ voice/conversation.py:30
-            │   │       ├─ manager.get_all_medications()  → medication/manager.py:31
-            │   │       ├─ manager.get_all_intake_history() → medication/manager.py:203
-            │   │       └─ manager.get_pending_reminders() → medication/manager.py:214
-            │   │       Returns formatted context string with meds, logs, pending
-            │   │
-            │   ├─ client.chat(text, extra_context=context)
-            │   │   └─ llm/ollama_client.py:14 — chat()
-            │   │       ├─ Appends to conversation history
-            │   │       ├─ POST http://localhost:11434/api/chat
-            │   │       │   (system prompt + medication context + history)
-            │   │       └─ Returns LLM reply
-            │   │
-            │   └─ _process_taken_tags(reply, manager)
-            │       └─ voice/conversation.py:79
-            │           ├─ Finds [TAKEN: medication_name] tags in reply
-            │           ├─ manager.get_pending_reminders() → medication/manager.py:214
-            │           ├─ manager.mark_taken(log_id) → medication/manager.py:143
-            │           └─ Strips tags, returns clean reply
-            │
-            └─ GENERAL → :147
-                └─ client.chat(text)  — no medication context injected
-                    └─ llm/ollama_client.py:14
 
-        └─ :149 — Prints "Aloxa: {reply}"
-            └─ Back to top of LOOP
+## Testing
+
+```bash
+pytest
 ```
+
+The CRUD/unit test suite covers 20+ tests and uses isolated temporary databases via `tests/conftest.py`.
 
 ### Summary
 
 There are two Ollama calls per turn:
 
-1. **Intent classification** (`llm/intent_classifier.py`) — lightweight, no history, just returns a label
-2. **Response generation** (`llm/ollama_client.py`) — stateful with conversation history, only for MEDICATION and GENERAL intents
+1. **Intent classification** (`llm/intent_classifier.py`) — lightweight, no history, just returns a label.
+2. **Response generation** (`llm/ollama_client.py`) — stateful with conversation history, only for `MEDICATION` and `GENERAL` intents.
